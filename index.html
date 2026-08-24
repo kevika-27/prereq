@@ -3,189 +3,105 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prereq — NYU CS course planner</title>
+<title>Prereq — NYU degree planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#12161F;
-  --paper:#EAEEF5;
-  --surface:#FFFFFF;
-  --line:#C6D0E0;
-  --line-soft:#DEE5EF;
-  --primary:#3D2BD9;
-  --primary-soft:#E7E4FB;
-  --accent:#0B7F70;
-  --accent-soft:#DCF0EC;
-  --danger:#B01F3C;
-  --danger-soft:#FBE3E8;
-  --muted:#65708A;
-  --done:#94A0B8;
-  --r:6px;
+  --ink:#12161F; --paper:#EAEEF5; --surface:#FFFFFF;
+  --line:#C6D0E0; --line-soft:#DEE5EF;
+  --primary:#3D2BD9; --primary-soft:#E7E4FB;
+  --accent:#0B7F70; --accent-soft:#DCF0EC;
+  --danger:#B01F3C; --danger-soft:#FBE3E8;
+  --muted:#65708A; --done:#94A0B8; --r:6px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:'Archivo',system-ui,sans-serif;
-  font-size:14px;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
+body{background:var(--paper);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
-
-/* ---------- masthead ---------- */
-header{
-  border-bottom:1px solid var(--line);
-  background:var(--surface);
-  padding:22px 28px 18px;
-}
 .wrap{max-width:1440px;margin:0 auto}
-.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-h1{
-  font-family:'Fraunces',Georgia,serif;
-  font-weight:600;
-  font-size:30px;
-  letter-spacing:-.02em;
-  margin:0;
-}
-.sub{color:var(--muted);font-size:13px;max-width:62ch}
-.tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:.09em;
-  text-transform:uppercase;
-  color:var(--primary);
-  border:1px solid var(--primary);
-  border-radius:3px;
-  padding:2px 7px;
-}
 
-/* ---------- layout ---------- */
-.cols{display:grid;grid-template-columns:288px 1fr;gap:0;align-items:start}
-aside{
-  border-right:1px solid var(--line);
-  background:var(--surface);
-  padding:20px;
-  height:calc(100vh - 88px);
-  overflow-y:auto;
-  position:sticky;
-  top:0;
-}
+header{border-bottom:1px solid var(--line);background:var(--surface);padding:22px 28px 18px}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);font-size:13px;max-width:74ch;margin:6px 0 0}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--primary);border:1px solid var(--primary);border-radius:3px;padding:2px 7px}
+
+.cols{display:grid;grid-template-columns:300px 1fr;align-items:start}
+aside{border-right:1px solid var(--line);background:var(--surface);padding:20px;height:calc(100vh - 96px);overflow-y:auto;position:sticky;top:0}
 main{padding:20px 28px 60px;min-width:0}
 
-/* ---------- controls ---------- */
-.field{margin-bottom:20px}
-label.lbl{
-  display:block;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:.09em;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:7px;
-}
-select,input[type=number]{
-  width:100%;
-  font-family:'Archivo',sans-serif;
-  font-size:13px;
-  padding:8px 10px;
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  background:var(--surface);
-  color:var(--ink);
-}
+.field{margin-bottom:18px}
+label.lbl,.lbl{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+select,input[type=number]{width:100%;font-family:'Archivo',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink)}
 select:focus,input:focus,button:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
-
 .hint{margin:6px 0 0;font-size:11px;line-height:1.4;color:var(--muted)}
-.checklist{border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden}
-.checkrow{
-  display:flex;align-items:center;gap:9px;
-  padding:6px 10px;
-  border-bottom:1px solid var(--line-soft);
-  cursor:pointer;
-  font-size:12px;
-}
+.divider{border:none;border-top:1px solid var(--line-soft);margin:20px 0}
+.sect{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);font-weight:600;margin:0 0 12px}
+
+.checklist{border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;max-height:260px;overflow-y:auto}
+.checkrow{display:flex;align-items:center;gap:9px;padding:6px 10px;border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:12px}
 .checkrow:last-child{border-bottom:none}
 .checkrow:hover{background:var(--paper)}
 .checkrow input{margin:0;accent-color:var(--primary)}
 .checkrow .code{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
 .checkrow.on .code{color:var(--accent)}
-
-.btn{
-  width:100%;
-  font-family:'Archivo',sans-serif;
-  font-size:12px;font-weight:500;
-  padding:8px 10px;
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  background:var(--surface);
-  color:var(--ink);
-  cursor:pointer;
-  margin-bottom:7px;
-}
+.btn{width:100%;font-family:'Archivo',sans-serif;font-size:12px;font-weight:500;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);cursor:pointer;margin-bottom:7px}
 .btn:hover{border-color:var(--primary);color:var(--primary)}
 .btn.warn:hover{border-color:var(--danger);color:var(--danger)}
 
-/* ---------- stats ---------- */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
 .stat{background:var(--surface);padding:12px 14px}
 .stat .k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .stat .v{font-family:'Fraunces',serif;font-size:25px;font-weight:600;line-height:1.05;letter-spacing:-.02em}
 .stat .n{font-size:11px;color:var(--muted);margin-top:2px}
 .stat.bad .v{color:var(--danger)}
+.stat.good .v{color:var(--accent)}
 
-/* ---------- tabs ---------- */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:18px}
-.tab{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
-  padding:9px 15px;
-  background:none;border:none;border-bottom:2px solid transparent;
-  color:var(--muted);cursor:pointer;
-}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:9px 15px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer}
 .tab[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary)}
 
-/* ---------- graph ---------- */
+.tree{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:18px 22px;font-size:13px}
+.tnode{padding-left:20px;border-left:1px solid var(--line-soft);margin-left:4px}
+.tnode.root{padding-left:0;border-left:none;margin-left:0}
+.trow{padding:3px 0;display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
+.tgroup{font-weight:600;padding:9px 0 3px}
+.tgroup.lv1{font-family:'Fraunces',serif;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.tcode{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);min-width:104px}
+.tcode.done{color:var(--accent)}
+.tcr{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted)}
+.tchoice{border:1px solid var(--primary);background:var(--primary-soft);border-radius:var(--r);padding:10px 13px;margin:10px 0}
+.tchoice .hd{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--primary);font-weight:600;margin-bottom:7px}
+.tchoice .opts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px}
+.optbtn{font-family:'Archivo',sans-serif;font-size:12px;padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--muted);cursor:pointer}
+.optbtn[aria-pressed=true]{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:500}
+.tchoice .cnote{font-size:11.5px;color:var(--muted);line-height:1.45;margin-bottom:4px}
+.tslot{color:var(--muted);font-style:italic}
+
 #graphScroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 #graphInner{position:relative}
 #edges{position:absolute;inset:0;pointer-events:none}
-.node{
-  position:absolute;
-  width:184px;
-  border:1px solid var(--line);
-  border-left:3px solid var(--muted);
-  border-radius:var(--r);
-  background:var(--surface);
-  padding:7px 9px;
-  cursor:pointer;
-  transition:transform .12s ease, box-shadow .12s ease;
-}
+.node{position:absolute;width:184px;border:1px solid var(--line);border-left:3px solid var(--muted);border-radius:var(--r);background:var(--surface);padding:7px 9px;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
 .node:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(18,22,31,.11)}
-.node .code{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:.01em}
+.node .code{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted)}
 .node .name{font-size:12px;font-weight:500;line-height:1.28;margin-top:1px}
-.node.done{border-left-color:var(--done);background:#F5F7FA;opacity:.62}
+.node.done{border-left-color:var(--done);background:#F5F7FA;opacity:.6}
 .node.ready{border-left-color:var(--accent);background:var(--accent-soft)}
+.node.core{border-style:dashed}
 .node.sel{border-left-color:var(--primary);background:var(--primary-soft);border-color:var(--primary)}
 .node.anc{border-left-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
 .node.desc{border-left-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.node.dim{opacity:.24}
+.node.dim{opacity:.22}
 .node.cyc{border-left-color:var(--danger);background:var(--danger-soft);border-color:var(--danger)}
 .colhdr{position:absolute;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 0;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
 
-/* ---------- plan ---------- */
 .semgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
 .sem{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
-.sem h3{
-  margin:0;padding:9px 12px;
-  border-bottom:1px solid var(--line-soft);
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.09em;text-transform:uppercase;
-  font-weight:600;color:var(--primary);
-  display:flex;justify-content:space-between;
-}
+.sem h3{margin:0;padding:9px 12px;border-bottom:1px solid var(--line-soft);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--primary);display:flex;justify-content:space-between}
 .sem h3 span{color:var(--muted);font-weight:400}
 .sem ul{list-style:none;margin:0;padding:8px 12px 11px}
 .sem li{padding:4px 0;font-size:12.5px;border-bottom:1px solid var(--line-soft)}
@@ -193,9 +109,8 @@ select:focus,input:focus,button:focus-visible{outline:2px solid var(--primary);o
 .sem li .code{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);display:block}
 .sem li.crit .code{color:var(--danger)}
 
-/* ---------- detail ---------- */
 .detail{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:15px 17px;margin-top:18px}
-.detail h4{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0 0 2px;letter-spacing:-.01em}
+.detail h4{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0 0 2px}
 .detail .code{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
 .detail p{margin:9px 0 0;font-size:12.5px;color:var(--muted);max-width:70ch}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
@@ -203,26 +118,17 @@ select:focus,input:focus,button:focus-visible{outline:2px solid var(--primary);o
 .chip.a{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
 .chip.d{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 .dcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
-.dcols .lbl{margin-bottom:5px}
 
-.banner{
-  border:1px solid var(--danger);
-  background:var(--danger-soft);
-  color:var(--danger);
-  border-radius:var(--r);
-  padding:10px 13px;
-  font-size:12.5px;
-  margin-bottom:16px;
-}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 0;font-size:11px;color:var(--muted)}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.banner{border:1px solid var(--danger);background:var(--danger-soft);color:var(--danger);border-radius:var(--r);padding:10px 13px;font-size:12.5px;margin-bottom:16px}
+.note{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);border-radius:var(--r);padding:11px 14px;font-size:12px;margin-bottom:16px}
+.note-hd{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;margin-bottom:7px}
+.note-row{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;padding-top:4px}
+.note-row .mono{font-size:11px}
+.note-by{color:var(--muted);font-size:11.5px}
+.note-sub{color:var(--muted);font-size:11px;line-height:1.4}
 footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:var(--muted);font-size:11.5px}
 .hidden{display:none}
-@media (max-width:900px){
-  .cols{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
-  .dcols{grid-template-columns:1fr}
-}
+@media (max-width:900px){.cols{grid-template-columns:1fr}aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}.dcols{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -232,23 +138,29 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
   <div class="wrap">
     <div class="brand">
       <h1>Prereq</h1>
-      <span class="tag">Topological course planner</span>
+      <span class="tag">NYU degree planner</span>
     </div>
-    <p class="sub">Models the NYU Courant course catalog as a directed acyclic graph. Tick off what you have finished, and it computes the shortest valid path to the degree using Kahn's algorithm, packs each semester against a real credit budget, and finds the critical path that sets your true minimum time to graduate.</p>
+    <p class="sub">A degree is not a list of courses. It is a tree of requirements where some branches are choices, and it only becomes a schedulable graph once those choices are made. This resolves the tree, then runs Kahn's algorithm over whatever falls out.</p>
   </div>
 </header>
 
 <div class="wrap cols">
   <aside>
     <div class="field">
-      <label class="lbl" for="track">Degree track</label>
-      <select id="track"></select>
+      <label class="lbl" for="degree">Degree</label>
+      <select id="degree"></select>
+      <p class="hint" id="schoolLine"></p>
     </div>
 
+    <hr class="divider">
+    <p class="sect">Your choices</p>
+    <div id="choices"></div>
+
+    <hr class="divider">
     <div class="field">
       <label class="lbl" for="cap">Credits per semester</label>
-      <input type="number" id="cap" min="4" max="20" step="1" value="16">
-      <p class="hint">NYU requires 16 and caps at 18 without an overload petition. Most CSCI-UA and MATH-UA courses are 4 credits, so that is four to five courses.</p>
+      <input type="number" id="cap" min="4" max="20" value="16">
+      <p class="hint">NYU requires 16 and caps at 18 without an overload petition.</p>
     </div>
 
     <div class="field">
@@ -256,514 +168,281 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
       <div class="checklist" id="checklist"></div>
     </div>
 
-    <div class="field">
-      <button class="btn" id="clearBtn">Clear all completed</button>
-      <button class="btn warn" id="cycleBtn">Inject a circular prerequisite</button>
-    </div>
+    <button class="btn" id="minBtn">Resolve to fewest credits</button>
+    <button class="btn" id="clearBtn">Clear completed</button>
+    <button class="btn warn" id="cycleBtn">Inject a circular prerequisite</button>
   </aside>
 
   <main>
     <div id="cycleBanner" class="banner hidden"></div>
-
+    <div id="exemptBanner" class="note hidden"></div>
     <div class="stats" id="stats"></div>
 
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" aria-selected="true" data-view="graph">Prerequisite graph</button>
+      <button class="tab" role="tab" aria-selected="true" data-view="tree">Requirements</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="graph">Prerequisite graph</button>
       <button class="tab" role="tab" aria-selected="false" data-view="plan">Semester plan</button>
     </div>
 
-    <section id="view-graph">
+    <section id="view-tree"><div class="tree" id="treeBox"></div></section>
+
+    <section id="view-graph" class="hidden">
       <div id="graphScroll"><div id="graphInner"><svg id="edges"></svg></div></div>
       <div class="legend">
         <span><i style="background:var(--done)"></i>Completed</span>
         <span><i style="background:var(--accent)"></i>Available now</span>
-        <span><i style="background:var(--primary)"></i>Selected and its prerequisites</span>
-        <span><i style="background:var(--line)"></i>Blocked</span>
+        <span><i style="background:var(--primary)"></i>Selected and prerequisites</span>
+        <span><i style="border:1px dashed var(--muted)"></i>Core Curriculum</span>
       </div>
       <div class="detail" id="detail"></div>
     </section>
 
-    <section id="view-plan" class="hidden">
-      <div class="semgrid" id="semgrid"></div>
-    </section>
+    <section id="view-plan" class="hidden"><div class="semgrid" id="semgrid"></div></section>
   </main>
 </div>
 
 <footer class="wrap">
-  Prerequisite data transcribed from the NYU Bulletin and the Courant course sequence pages. Verify against Albert before registering. Built as a data structures exercise: graph construction, Kahn topological sort, three-colour DFS cycle detection, and longest-path dynamic programming, all implemented from scratch with no graph libraries.
+  Requirements transcribed from the NYU Bulletin, the Courant course sequence pages, and the CAS Core Curriculum site. Verify against Albert before registering. Built as a data structures exercise: an AND/OR requirement tree resolved into a DAG, then Kahn topological sort, three-colour DFS cycle detection, longest-path dynamic programming, and greedy credit-budgeted scheduling, all written from scratch.
 </footer>
 
+<script src="data.js"></script>
+<script src="engine.js"></script>
 <script>
-/* ============================================================
-   DATA — NYU Courant course catalogue as an adjacency list.
-   Each course lists the courses that must be completed first.
-   ============================================================ */
-const CATALOG = {
-  'CSCI-UA 2':   {name:'Intro to Computer Programming (No Prior Experience)', prereqs:[], credits:4},
-  'CSCI-UA 101': {name:'Introduction to Computer Science', prereqs:['CSCI-UA 2'], credits:4},
-  'CSCI-UA 102': {name:'Data Structures', prereqs:['CSCI-UA 101'], credits:4},
-  'CSCI-UA 201': {name:'Computer Systems Organization', prereqs:['CSCI-UA 102'], credits:4},
-  'CSCI-UA 202': {name:'Operating Systems', prereqs:['CSCI-UA 201'], credits:4},
-  'CSCI-UA 310': {name:'Basic Algorithms', prereqs:['CSCI-UA 102','MATH-UA 120'], credits:4},
-  'CSCI-UA 421': {name:'Numerical Computing', prereqs:['CSCI-UA 102','MATH-UA 140'], credits:4},
-  'CSCI-UA 473': {name:'Fundamentals of Machine Learning', prereqs:['CSCI-UA 310','MATH-UA 140'], credits:4},
-  'CSCI-UA 479': {name:'Data Management and Analysis', prereqs:['CSCI-UA 201'], credits:4},
-  'CSCI-UA 480': {name:'Special Topics in Computer Science', prereqs:['CSCI-UA 310'], credits:4},
-
-  'MATH-UA 9':   {name:'Algebra and Calculus', prereqs:[], credits:4},
-  'MATH-UA 121': {name:'Calculus I', prereqs:['MATH-UA 9'], credits:4},
-  'MATH-UA 122': {name:'Calculus II', prereqs:['MATH-UA 121'], credits:4},
-  'MATH-UA 123': {name:'Calculus III', prereqs:['MATH-UA 122'], credits:4},
-  'MATH-UA 120': {name:'Discrete Mathematics', prereqs:['MATH-UA 121'], credits:4},
-  'MATH-UA 140': {name:'Linear Algebra', prereqs:['MATH-UA 121'], credits:4},
-
-  'MATH-UA 131': {name:'Calculus I (Econ & CS track)', prereqs:['MATH-UA 9'], credits:4},
-  'MATH-UA 132': {name:'Calculus II (Econ & CS track)', prereqs:['MATH-UA 131'], credits:4},
-  'MATH-UA 133': {name:'Calculus III (Econ & CS track)', prereqs:['MATH-UA 132'], credits:4},
-
-  'ECON-UA 1':   {name:'Introduction to Macroeconomics', prereqs:[], credits:4},
-  'ECON-UA 2':   {name:'Introduction to Microeconomics', prereqs:[], credits:4},
-  'ECON-UA 11':  {name:'Intermediate Microeconomics', prereqs:['ECON-UA 2','MATH-UA 121'], credits:4},
-  'ECON-UA 12':  {name:'Intermediate Macroeconomics', prereqs:['ECON-UA 1','ECON-UA 11'], credits:4},
-  'ECON-UA 18':  {name:'Statistics', prereqs:['MATH-UA 121'], credits:4},
-  'ECON-UA 266': {name:'Introduction to Econometrics', prereqs:['ECON-UA 18','ECON-UA 11'], credits:4}
-};
-
-const TRACKS = {
-  'cs': {
-    label:'Computer Science (BA)',
-    required:['CSCI-UA 2','CSCI-UA 101','CSCI-UA 102','CSCI-UA 201','CSCI-UA 202',
-              'CSCI-UA 310','MATH-UA 9','MATH-UA 121','MATH-UA 120','MATH-UA 140',
-              'CSCI-UA 473','CSCI-UA 479','CSCI-UA 480']
-  },
-  'csmath': {
-    label:'Computer Science & Mathematics (BA)',
-    required:['CSCI-UA 2','CSCI-UA 101','CSCI-UA 102','CSCI-UA 201','CSCI-UA 202',
-              'CSCI-UA 310','CSCI-UA 421','CSCI-UA 480','MATH-UA 9','MATH-UA 121',
-              'MATH-UA 122','MATH-UA 123','MATH-UA 120','MATH-UA 140']
-  },
-  'econcs': {
-    label:'Economics & Computer Science (BA)',
-    required:['CSCI-UA 2','CSCI-UA 101','CSCI-UA 102','CSCI-UA 201','CSCI-UA 202',
-              'CSCI-UA 310','CSCI-UA 473','CSCI-UA 479','CSCI-UA 480',
-              'MATH-UA 9','MATH-UA 120','MATH-UA 131','MATH-UA 132','MATH-UA 133','MATH-UA 140',
-              'ECON-UA 1','ECON-UA 2','ECON-UA 11','ECON-UA 12','ECON-UA 18','ECON-UA 266']
-  }
-};
-
-/* ============================================================
-   STATE
-   ============================================================ */
-let track = 'econcs';
+let degreeId = 'econcs';
+let choices = {};
 let completed = new Set();
 let selected = null;
-let injectedCycle = false;
-let view = 'graph';
+let injectCycle = false;
+let view = 'tree';
+let lastDropped = [];
 
-/* ============================================================
-   GRAPH CONSTRUCTION
-   Build the induced subgraph over the courses this track needs,
-   including any transitive prerequisites outside the listed set.
-   ============================================================ */
-function buildGraph(){
-  const nodes = new Set();
-  const stack = [...TRACKS[track].required];
-  while(stack.length){
-    const c = stack.pop();
-    if(nodes.has(c) || !CATALOG[c]) continue;
-    nodes.add(c);
-    for(const p of prereqsOf(c)) stack.push(p);
-  }
-  const inEdges = new Map();   // course -> its prerequisites
-  const outEdges = new Map();  // course -> what it unlocks
-  for(const n of nodes){ inEdges.set(n,[]); outEdges.set(n,[]); }
-  for(const n of nodes){
-    for(const p of prereqsOf(n)){
-      if(!nodes.has(p)) continue;
-      inEdges.get(n).push(p);
-      outEdges.get(p).push(n);
-    }
-  }
-  return {nodes:[...nodes], inEdges, outEdges};
-}
-
-function prereqsOf(c){
-  const base = CATALOG[c] ? CATALOG[c].prereqs.slice() : [];
-  // Demo hook: creates CSCI-UA 101 -> 102 -> 201 -> 101, an impossible loop.
-  if(injectedCycle && c === 'CSCI-UA 101') base.push('CSCI-UA 201');
-  return base;
-}
-
-/* ============================================================
-   CYCLE DETECTION — iterative DFS with three-colour marking.
-   White = unvisited, grey = on the current path, black = done.
-   An edge into a grey node is a back edge, so the graph has a cycle.
-   ============================================================ */
-function findCycle(g){
-  const WHITE=0, GREY=1, BLACK=2;
-  const colour = new Map(g.nodes.map(n=>[n,WHITE]));
-  const parent = new Map();
-
-  for(const root of g.nodes){
-    if(colour.get(root) !== WHITE) continue;
-    const stack = [[root,false]];
-    while(stack.length){
-      const [node, processed] = stack.pop();
-      if(processed){ colour.set(node,BLACK); continue; }
-      if(colour.get(node) !== WHITE) continue;
-      colour.set(node,GREY);
-      stack.push([node,true]);
-      for(const next of g.outEdges.get(node)){
-        if(colour.get(next) === GREY){
-          // Walk parent pointers back from node to next to recover the loop.
-          const cycle = [next];
-          let cur = node;
-          while(cur !== next && cur !== undefined){ cycle.push(cur); cur = parent.get(cur); }
-          cycle.push(next);
-          return cycle.reverse();
-        }
-        if(colour.get(next) === WHITE){
-          parent.set(next,node);
-          stack.push([next,false]);
-        }
-      }
-    }
-  }
-  return null;
-}
-
-/* ============================================================
-   TOPOLOGICAL SORT — Kahn's algorithm.
-   Repeatedly take courses with no unmet prerequisites. The level
-   of a course is one past the deepest level of its prerequisites,
-   which is the earliest semester it could possibly be taken.
-   ============================================================ */
-function kahn(g){
-  const indeg = new Map(g.nodes.map(n=>[n, g.inEdges.get(n).length]));
-  const level = new Map(g.nodes.map(n=>[n,0]));
-  const queue = g.nodes.filter(n=>indeg.get(n)===0);
-  const order = [];
-
-  while(queue.length){
-    const n = queue.shift();
-    order.push(n);
-    for(const next of g.outEdges.get(n)){
-      level.set(next, Math.max(level.get(next), level.get(n)+1));
-      indeg.set(next, indeg.get(next)-1);
-      if(indeg.get(next)===0) queue.push(next);
-    }
-  }
-  // A short order means some nodes never reached in-degree zero: a cycle.
-  return {order, level, complete: order.length === g.nodes.length};
-}
-
-/* ============================================================
-   CRITICAL PATH — longest path in a DAG.
-   Relax edges in topological order; every prefix is already final,
-   so one pass is enough. This chain sets the floor on semesters.
-   ============================================================ */
-function criticalPath(g, order){
-  const dist = new Map(g.nodes.map(n=>[n,1]));
-  const from = new Map();
-  for(const n of order){
-    for(const next of g.outEdges.get(n)){
-      if(dist.get(n)+1 > dist.get(next)){
-        dist.set(next, dist.get(n)+1);
-        from.set(next, n);
-      }
-    }
-  }
-  let end = null, best = 0;
-  for(const [n,d] of dist) if(d > best){ best = d; end = n; }
-  const path = [];
-  let cur = end;
-  while(cur !== undefined){ path.push(cur); cur = from.get(cur); }
-  return {path: path.reverse(), length: best};
-}
-
-/* ============================================================
-   REACHABILITY — BFS up the prerequisite edges and down the
-   unlock edges, so a click answers "what do I need" and
-   "what does this open up".
-   ============================================================ */
-function reach(g, start, edgeMap){
-  const seen = new Set();
-  const queue = [start];
-  while(queue.length){
-    const n = queue.shift();
-    for(const next of edgeMap.get(n) || []){
-      if(!seen.has(next)){ seen.add(next); queue.push(next); }
-    }
-  }
-  return seen;
-}
-
-/* ============================================================
-   SEMESTER PACKING — greedy scheduling over the topological order,
-   budgeted in credits rather than course count. Each round takes
-   every course whose prerequisites are satisfied, prefers the ones
-   that unlock the most downstream work, and fills the semester
-   until the next course would exceed the credit cap.
-   ============================================================ */
-function creditsOf(c){ return (CATALOG[c] && CATALOG[c].credits) || 4; }
-
-function packSemesters(g, cap){
-  const unlocks = new Map(g.nodes.map(n=>[n, reach(g,n,g.outEdges).size]));
-  const remaining = new Set(g.nodes.filter(n=>!completed.has(n)));
-  const have = new Set(completed);
-  const semesters = [];
-
-  while(remaining.size){
-    const ready = [...remaining].filter(n =>
-      g.inEdges.get(n).every(p => have.has(p))
-    );
-    if(!ready.length) break; // unreachable: a cycle blocks the rest
-    ready.sort((a,b) => unlocks.get(b) - unlocks.get(a) || a.localeCompare(b));
-
-    // Fill the credit budget. Keep scanning past a course that does not
-    // fit, since a lighter one further down the list still might.
-    const taking = [];
-    let load = 0;
-    for(const c of ready){
-      if(load + creditsOf(c) > cap) continue;
-      taking.push(c);
-      load += creditsOf(c);
-    }
-    if(!taking.length) break; // every remaining course exceeds the cap alone
-    semesters.push({courses:taking, credits:load});
-    for(const c of taking){ remaining.delete(c); have.add(c); }
-  }
-  return {semesters, stranded:[...remaining]};
-}
-
-/* ============================================================
-   RENDERING
-   ============================================================ */
-const NODE_W = 184, NODE_H = 54, COL_GAP = 236, ROW_GAP = 74, PAD_X = 26, PAD_Y = 42;
-
-function readCap(){
-  const v = +document.getElementById('cap').value;
-  return (isFinite(v) && v >= 4) ? v : 16;
-}
+function readCap(){ const v = +document.getElementById('cap').value; return (isFinite(v) && v >= 4) ? v : 16; }
+function isCore(c){ const d = courseDef(c); return !!(d && d.core); }
 
 function render(){
-  const g = buildGraph();
+  const deg = DEGREES[degreeId];
+  const raw = resolve(deg.tree, choices);
+  const {codes, dropped} = applyExemptions(raw);
+  lastDropped = dropped;
+
+  const g = buildGraph(codes, {injectCycle});
   const cyc = findCycle(g);
   const {order, level, complete} = kahn(g);
   const crit = complete ? criticalPath(g, order) : {path:[], length:0};
-  const plan = packSemesters(g, readCap());
+  const plan = packSemesters(g, readCap(), completed);
 
-  renderBanner(cyc);
-  renderStats(g, crit, plan, cyc, complete);
+  document.getElementById('schoolLine').textContent = deg.school + ' \u00b7 ' + deg.totalCredits + ' credits to graduate';
+  renderCycle(cyc);
+  renderExempt();
+  renderStats(g, crit, plan, cyc, complete, deg);
+  renderChoices(deg);
   renderChecklist(g);
-  renderGraph(g, level, cyc, crit);
+  renderTree(deg);
+  renderGraph(g, level, cyc);
   renderPlan(plan, crit);
   renderDetail(g);
 }
 
-function renderBanner(cyc){
+function renderCycle(cyc){
   const el = document.getElementById('cycleBanner');
   if(!cyc){ el.classList.add('hidden'); return; }
   el.classList.remove('hidden');
-  el.innerHTML = '<strong>Circular prerequisite found.</strong> No valid ordering exists, '
-    + 'so scheduling is halted. Three-colour DFS traced the loop: <span class="mono">'
-    + cyc.join(' \u2192 ') + '</span>';
+  el.innerHTML = '<strong>Circular prerequisite found.</strong> No valid ordering exists, so scheduling stops. '
+    + 'Three-colour DFS traced the loop: <span class="mono">' + cyc.join(' \u2192 ') + '</span>';
 }
 
-function renderStats(g, crit, plan, cyc, complete){
-  const total = g.nodes.length;
-  const done = g.nodes.filter(n=>completed.has(n)).length;
-  const ready = g.nodes.filter(n=>!completed.has(n) && g.inEdges.get(n).every(p=>completed.has(p))).length;
-  const cap = readCap();
-  const left = g.nodes.filter(n=>!completed.has(n)).reduce((s,c)=>s+creditsOf(c),0);
-  const floor = complete ? Math.max(crit.length, Math.ceil(left/cap)) : 0;
+function renderExempt(){
+  const el = document.getElementById('exemptBanner');
+  if(!lastDropped.length){ el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  const saved = lastDropped.reduce((s,e)=>s+e.credits,0);
+  el.innerHTML = `<div class="note-hd">Core already covered by your major \u00b7 ${saved} credits saved</div>`
+    + lastDropped.map(e => `<div class="note-row"><span class="mono">${e.code}</span><span>${courseDef(e.code).name}</span><span class="note-by">via <span class="mono">${e.by}</span></span></div><div class="note-sub">${e.note}</div>`).join('')
+    + `<div class="note-sub" style="margin-top:7px">Exemption policy varies by advisor. Edit <span class="mono">EXEMPTIONS</span> in data.js to match your degree audit.</div>`;
+}
+
+function renderStats(g, crit, plan, cyc, complete, deg){
+  const totalCr = g.nodes.reduce((s,c)=>s+creditsOf(c),0);
+  const leftCr  = g.nodes.filter(n=>!completed.has(n)).reduce((s,c)=>s+creditsOf(c),0);
+  const ready   = g.nodes.filter(n=>!completed.has(n) && g.inEdges.get(n).every(p=>completed.has(p))).length;
+  const bound   = complete ? (plan.semesters.length > crit.length ? 'volume-bound' : 'sequence-bound') : 'no valid ordering';
+  const diff    = totalCr - deg.totalCredits;
+  const fit     = diff === 0 ? 'matches the degree total' : (diff > 0 ? diff + ' over' : (-diff) + ' under, room for free electives');
 
   const cells = [
-    {k:'Credits remaining', v:left, n:done + ' of ' + total + ' courses done'},
-    {k:'Available now', v:ready, n:ready ? 'prerequisites met' : 'nothing unblocked'},
-    {k:'Critical path', v:complete ? crit.length : '—', n:'longest chain of dependencies'},
-    {k:'Semesters needed', v:cyc ? '—' : plan.semesters.length, n: complete ? 'floor is ' + floor : 'no valid ordering'}
+    {k:'Credits required', v:totalCr, n:fit, cls: diff===0?'good':''},
+    {k:'Credits remaining', v:leftCr, n:ready + ' courses available now'},
+    {k:'Critical path', v:complete?crit.length:'\u2014', n:'longest dependency chain', cls: complete?'':'bad'},
+    {k:'Semesters', v:cyc?'\u2014':plan.semesters.length, n:bound, cls: cyc?'bad':''}
   ];
   document.getElementById('stats').innerHTML = cells.map(c =>
-    `<div class="stat${c.v==='—'?' bad':''}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="n">${c.n}</div></div>`
-  ).join('');
+    `<div class="stat ${c.cls||''}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="n">${c.n}</div></div>`).join('');
+}
+
+function renderChoices(deg){
+  const points = choicePoints(deg.tree);
+  document.getElementById('choices').innerHTML = points.map(p => `
+    <div class="field">
+      <label class="lbl">${p.label}</label>
+      <select data-choice="${p.id}">
+        ${p.options.map((o,i)=>`<option value="${i}"${(choices[p.id]??0)===i?' selected':''}>${o.label}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  document.querySelectorAll('[data-choice]').forEach(sel => {
+    sel.addEventListener('change', e => { choices[e.target.dataset.choice] = +e.target.value; selected = null; render(); });
+  });
 }
 
 function renderChecklist(g){
   const el = document.getElementById('checklist');
-  const sorted = g.nodes.slice().sort();
-  el.innerHTML = sorted.map(c =>
-    `<label class="checkrow${completed.has(c)?' on':''}">
-       <input type="checkbox" data-c="${c}"${completed.has(c)?' checked':''}>
-       <span><span class="code">${c}</span></span>
-     </label>`
-  ).join('');
-  el.querySelectorAll('input').forEach(box => {
-    box.addEventListener('change', e => {
-      const c = e.target.dataset.c;
-      e.target.checked ? completed.add(c) : completed.delete(c);
-      render();
-    });
-  });
+  el.innerHTML = g.nodes.slice().sort().map(c =>
+    `<label class="checkrow${completed.has(c)?' on':''}"><input type="checkbox" data-c="${c}"${completed.has(c)?' checked':''}><span class="code">${c}</span></label>`).join('');
+  el.querySelectorAll('input').forEach(b => b.addEventListener('change', e => {
+    e.target.checked ? completed.add(e.target.dataset.c) : completed.delete(e.target.dataset.c);
+    render();
+  }));
 }
 
-function renderGraph(g, level, cyc, crit){
-  const byLevel = new Map();
-  for(const n of g.nodes){
-    const L = level.get(n);
-    if(!byLevel.has(L)) byLevel.set(L,[]);
-    byLevel.get(L).push(n);
-  }
-  const levels = [...byLevel.keys()].sort((a,b)=>a-b);
-  const pos = new Map();
-  let maxRows = 0;
-  for(const L of levels){
-    const col = byLevel.get(L).sort();
-    maxRows = Math.max(maxRows, col.length);
-    col.forEach((n,i)=> pos.set(n,{x: PAD_X + L*COL_GAP, y: PAD_Y + i*ROW_GAP}));
-  }
-  const W = PAD_X*2 + (levels.length-1)*COL_GAP + NODE_W;
-  const H = PAD_Y + maxRows*ROW_GAP + 16;
+function renderTree(deg){
+  document.getElementById('treeBox').innerHTML = treeHTML(deg.tree, 0);
+  document.querySelectorAll('.optbtn').forEach(b => b.addEventListener('click', e => {
+    choices[e.target.dataset.id] = +e.target.dataset.i; selected = null; render();
+  }));
+}
 
-  const inner = document.getElementById('graphInner');
-  inner.style.width = W + 'px';
-  inner.style.height = H + 'px';
-
-  const ancestors   = selected ? reach(g, selected, g.inEdges)  : new Set();
-  const descendants = selected ? reach(g, selected, g.outEdges) : new Set();
-  const cycSet = new Set(cyc || []);
-
-  // edges
-  const svg = document.getElementById('edges');
-  svg.setAttribute('width', W); svg.setAttribute('height', H);
-  let paths = '';
-  for(const n of g.nodes){
-    for(const p of g.inEdges.get(n)){
-      const a = pos.get(p), b = pos.get(n);
-      if(!a || !b) continue;
-      const x1 = a.x + NODE_W, y1 = a.y + NODE_H/2;
-      const x2 = b.x,          y2 = b.y + NODE_H/2;
-      const mx = (x1 + x2)/2;
-      let stroke = 'var(--line)', w = 1.25, op = .85;
-      if(cycSet.has(n) && cycSet.has(p)){ stroke='var(--danger)'; w=2; op=1; }
-      else if(selected && (ancestors.has(n)||n===selected) && (ancestors.has(p)||p===selected)){ stroke='var(--primary)'; w=2; op=1; }
-      else if(selected && (descendants.has(n)||n===selected) && (descendants.has(p)||p===selected)){ stroke='var(--accent)'; w=2; op=1; }
-      else if(selected){ op=.16; }
-      paths += `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${stroke}" stroke-width="${w}" opacity="${op}"/>`;
+function treeHTML(node, depth){
+  switch(node.kind){
+    case 'group': {
+      const cls = depth <= 1 ? 'tgroup lv1' : 'tgroup';
+      return `<div class="${cls}">${node.label}</div><div class="tnode${depth===0?' root':''}">`
+           + node.children.map(c=>treeHTML(c, depth+1)).join('') + `</div>`;
+    }
+    case 'course': {
+      const d = courseDef(node.code);
+      if(!d) return '';
+      const done = completed.has(node.code) ? ' done' : '';
+      return `<div class="trow"><span class="tcode${done}">${node.code}</span><span>${d.name}</span><span class="tcr">${d.credits} cr</span></div>`;
+    }
+    case 'slots':
+      return `<div class="trow"><span class="tcode">${node.prefix}</span><span class="tslot">${node.n} \u00d7 ${node.label}</span><span class="tcr">${node.n*4} cr</span></div>`;
+    case 'choice': {
+      const pick = choices[node.id] ?? 0;
+      const inner = node.options[pick].children.map(c=>treeHTML(c, depth+1)).join('')
+                 || '<div class="trow"><span class="tslot">No courses required under this option</span></div>';
+      return `<div class="tchoice">
+        <div class="hd">Choose one \u00b7 ${node.label}</div>
+        <div class="opts">${node.options.map((o,i)=>
+          `<button class="optbtn" data-id="${node.id}" data-i="${i}" aria-pressed="${i===pick}">${o.label}</button>`).join('')}</div>
+        ${node.note?`<div class="cnote">${node.note}</div>`:''}
+        <div class="tnode">${inner}</div>
+      </div>`;
     }
   }
-  svg.innerHTML = paths;
+  return '';
+}
 
-  // nodes + column headers
+const NODE_W=184, NODE_H=54, COL_GAP=236, ROW_GAP=74, PAD_X=26, PAD_Y=42;
+function renderGraph(g, level, cyc){
+  const byLevel = new Map();
+  for(const n of g.nodes){ const L=level.get(n); if(!byLevel.has(L)) byLevel.set(L,[]); byLevel.get(L).push(n); }
+  const levels=[...byLevel.keys()].sort((a,b)=>a-b);
+  const pos=new Map(); let maxRows=0;
+  for(const L of levels){
+    const col=byLevel.get(L).sort(); maxRows=Math.max(maxRows,col.length);
+    col.forEach((n,i)=>pos.set(n,{x:PAD_X+L*COL_GAP, y:PAD_Y+i*ROW_GAP}));
+  }
+  const W=PAD_X*2+(levels.length-1)*COL_GAP+NODE_W, H=PAD_Y+maxRows*ROW_GAP+16;
+  const inner=document.getElementById('graphInner');
+  inner.style.width=W+'px'; inner.style.height=H+'px';
+
+  const anc = selected ? reach(g, selected, g.inEdges)  : new Set();
+  const des = selected ? reach(g, selected, g.outEdges) : new Set();
+  const cycSet = new Set(cyc||[]);
+
+  const svg=document.getElementById('edges');
+  svg.setAttribute('width',W); svg.setAttribute('height',H);
+  let paths='';
+  for(const n of g.nodes) for(const p of g.inEdges.get(n)){
+    const a=pos.get(p), b=pos.get(n); if(!a||!b) continue;
+    const x1=a.x+NODE_W, y1=a.y+NODE_H/2, x2=b.x, y2=b.y+NODE_H/2, mx=(x1+x2)/2;
+    let stroke='var(--line)', w=1.25, op=.85;
+    if(cycSet.has(n)&&cycSet.has(p)){stroke='var(--danger)';w=2;op=1;}
+    else if(selected&&(anc.has(n)||n===selected)&&(anc.has(p)||p===selected)){stroke='var(--primary)';w=2;op=1;}
+    else if(selected&&(des.has(n)||n===selected)&&(des.has(p)||p===selected)){stroke='var(--accent)';w=2;op=1;}
+    else if(selected){op=.15;}
+    paths+=`<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${stroke}" stroke-width="${w}" opacity="${op}"/>`;
+  }
+  svg.innerHTML=paths;
+
   inner.querySelectorAll('.node,.colhdr').forEach(e=>e.remove());
   for(const L of levels){
-    const h = document.createElement('div');
-    h.className = 'colhdr';
-    h.style.left = (PAD_X + L*COL_GAP) + 'px';
-    h.style.top = '16px';
-    h.textContent = L === 0 ? 'No prerequisites' : 'Depth ' + L;
+    const h=document.createElement('div'); h.className='colhdr';
+    h.style.left=(PAD_X+L*COL_GAP)+'px'; h.style.top='16px';
+    h.textContent = L===0 ? 'No prerequisites' : 'Depth '+L;
     inner.appendChild(h);
   }
   for(const n of g.nodes){
-    const p = pos.get(n);
-    const el = document.createElement('div');
-    el.className = 'node';
-    const isReady = !completed.has(n) && g.inEdges.get(n).every(q=>completed.has(q));
-    if(completed.has(n)) el.classList.add('done');
-    else if(isReady) el.classList.add('ready');
+    const p=pos.get(n), el=document.createElement('div');
+    el.className='node';
+    const ready = !completed.has(n) && g.inEdges.get(n).every(q=>completed.has(q));
+    if(completed.has(n)) el.classList.add('done'); else if(ready) el.classList.add('ready');
+    if(isCore(n)) el.classList.add('core');
     if(cycSet.has(n)) el.classList.add('cyc');
     if(selected){
-      if(n === selected) el.classList.add('sel');
-      else if(ancestors.has(n)) el.classList.add('anc');
-      else if(descendants.has(n)) el.classList.add('desc');
+      if(n===selected) el.classList.add('sel');
+      else if(anc.has(n)) el.classList.add('anc');
+      else if(des.has(n)) el.classList.add('desc');
       else el.classList.add('dim');
     }
-    el.style.left = p.x + 'px';
-    el.style.top = p.y + 'px';
-    el.innerHTML = `<div class="code">${n}</div><div class="name">${CATALOG[n].name}</div>`;
-    el.addEventListener('click', ()=>{ selected = (selected === n) ? null : n; render(); });
+    el.style.left=p.x+'px'; el.style.top=p.y+'px';
+    el.innerHTML=`<div class="code">${n}</div><div class="name">${courseDef(n).name}</div>`;
+    el.addEventListener('click',()=>{selected = selected===n ? null : n; render();});
     inner.appendChild(el);
   }
 }
 
 function renderPlan(plan, crit){
-  const critSet = new Set(crit.path);
-  const grid = document.getElementById('semgrid');
-  if(!plan.semesters.length){
-    grid.innerHTML = '<div class="sem"><ul><li>Nothing left to schedule.</li></ul></div>';
-    return;
-  }
-  let html = plan.semesters.map((sem,i) =>
-    `<div class="sem">
-       <h3>Semester ${i+1}<span>${sem.credits} cr · ${sem.courses.length} course${sem.courses.length>1?'s':''}</span></h3>
-       <ul>${sem.courses.map(c=>
-         `<li class="${critSet.has(c)?'crit':''}"><span class="code">${c} · ${creditsOf(c)} cr</span>${CATALOG[c].name}</li>`
-       ).join('')}</ul>
-     </div>`
-  ).join('');
+  const critSet=new Set(crit.path);
+  const grid=document.getElementById('semgrid');
+  if(!plan.semesters.length){ grid.innerHTML='<div class="sem"><ul><li>Nothing left to schedule.</li></ul></div>'; return; }
+  let html=plan.semesters.map((s,i)=>
+    `<div class="sem"><h3>Semester ${i+1}<span>${s.credits} cr</span></h3><ul>${
+      s.courses.map(c=>`<li class="${critSet.has(c)?'crit':''}"><span class="code">${c} \u00b7 ${creditsOf(c)} cr</span>${courseDef(c).name}</li>`).join('')
+    }</ul></div>`).join('');
   if(plan.stranded.length){
-    html += `<div class="sem" style="border-color:var(--danger)">
-      <h3 style="color:var(--danger)">Unreachable<span>${plan.stranded.length}</span></h3>
-      <ul>${plan.stranded.map(c=>`<li><span class="code">${c}</span>${CATALOG[c].name}</li>`).join('')}</ul></div>`;
+    html+=`<div class="sem" style="border-color:var(--danger)"><h3 style="color:var(--danger)">Unreachable<span>${plan.stranded.length}</span></h3><ul>${
+      plan.stranded.map(c=>`<li><span class="code">${c}</span>${courseDef(c).name}</li>`).join('')}</ul></div>`;
   }
-  grid.innerHTML = html;
+  grid.innerHTML=html;
 }
 
 function renderDetail(g){
-  const el = document.getElementById('detail');
-  if(!selected){
-    el.innerHTML = '<p style="margin:0">Select any course to trace every prerequisite behind it and everything it unlocks. Both are breadth-first searches over the graph, run in opposite directions.</p>';
-    return;
-  }
-  const anc = [...reach(g, selected, g.inEdges)].sort();
-  const desc = [...reach(g, selected, g.outEdges)].sort();
-  const direct = g.inEdges.get(selected);
-  el.innerHTML = `
-    <div class="code">${selected}</div>
-    <h4>${CATALOG[selected].name}</h4>
-    <p>Direct prerequisites: ${direct.length ? direct.join(', ') : 'none, this is an entry point'}.</p>
+  const el=document.getElementById('detail');
+  if(!selected){ el.innerHTML='<p style="margin:0">Select any course to trace every prerequisite behind it and everything it unlocks. Both are breadth-first searches over the same graph, run in opposite directions.</p>'; return; }
+  const anc=[...reach(g,selected,g.inEdges)].sort(), des=[...reach(g,selected,g.outEdges)].sort();
+  const direct=g.inEdges.get(selected);
+  el.innerHTML=`<div class="code">${selected}</div><h4>${courseDef(selected).name}</h4>
+    <p>Direct prerequisites: ${direct.length?direct.join(', '):'none, this is an entry point'}.</p>
     <div class="dcols">
-      <div>
-        <div class="lbl">Must finish first (${anc.length})</div>
-        <div class="chips">${anc.length ? anc.map(c=>`<span class="chip a">${c}</span>`).join('') : '<span class="chip">nothing</span>'}</div>
-      </div>
-      <div>
-        <div class="lbl">Unlocks (${desc.length})</div>
-        <div class="chips">${desc.length ? desc.map(c=>`<span class="chip d">${c}</span>`).join('') : '<span class="chip">nothing downstream</span>'}</div>
-      </div>
+      <div><div class="lbl">Must finish first (${anc.length})</div><div class="chips">${anc.length?anc.map(c=>`<span class="chip a">${c}</span>`).join(''):'<span class="chip">nothing</span>'}</div></div>
+      <div><div class="lbl">Unlocks (${des.length})</div><div class="chips">${des.length?des.map(c=>`<span class="chip d">${c}</span>`).join(''):'<span class="chip">nothing downstream</span>'}</div></div>
     </div>`;
 }
 
-/* ============================================================
-   WIRING
-   ============================================================ */
-const trackSel = document.getElementById('track');
-trackSel.innerHTML = Object.entries(TRACKS).map(([k,v]) =>
-  `<option value="${k}"${k===track?' selected':''}>${v.label}</option>`).join('');
-trackSel.addEventListener('change', e => { track = e.target.value; selected = null; render(); });
+const degSel=document.getElementById('degree');
+degSel.innerHTML=Object.entries(DEGREES).map(([k,v])=>`<option value="${k}"${k===degreeId?' selected':''}>${v.name}</option>`).join('');
+degSel.addEventListener('change',e=>{degreeId=e.target.value; choices={}; completed.clear(); selected=null; render();});
 
-document.getElementById('cap').addEventListener('input', render);
-
-document.getElementById('clearBtn').addEventListener('click', () => {
-  completed.clear(); selected = null; render();
-});
-
-const cycleBtn = document.getElementById('cycleBtn');
-cycleBtn.addEventListener('click', () => {
-  injectedCycle = !injectedCycle;
-  cycleBtn.textContent = injectedCycle ? 'Remove circular prerequisite' : 'Inject a circular prerequisite';
-  selected = null;
-  render();
-});
-
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    view = t.dataset.view;
-    document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x === t)));
-    document.getElementById('view-graph').classList.toggle('hidden', view !== 'graph');
-    document.getElementById('view-plan').classList.toggle('hidden', view !== 'plan');
-  });
-});
+document.getElementById('cap').addEventListener('input',render);
+document.getElementById('clearBtn').addEventListener('click',()=>{completed.clear(); selected=null; render();});
+document.getElementById('minBtn').addEventListener('click',()=>{choices=minCreditChoices(DEGREES[degreeId].tree); selected=null; render();});
+const cb=document.getElementById('cycleBtn');
+cb.addEventListener('click',()=>{injectCycle=!injectCycle; cb.textContent=injectCycle?'Remove circular prerequisite':'Inject a circular prerequisite'; selected=null; render();});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  view=t.dataset.view;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===t)));
+  ['tree','graph','plan'].forEach(v=>document.getElementById('view-'+v).classList.toggle('hidden', v!==view));
+}));
 
 render();
 </script>
