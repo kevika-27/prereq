@@ -51,6 +51,12 @@ select:focus,input:focus,button:focus-visible{outline:2px solid var(--primary);o
 .btn:hover{border-color:var(--primary);color:var(--primary)}
 .btn.warn:hover{border-color:var(--danger);color:var(--danger)}
 
+.headline{border:1px solid var(--primary);border-radius:var(--r);background:var(--surface);padding:15px 18px;margin-bottom:16px}
+.headline .k{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--primary);font-weight:600;margin-bottom:5px}
+.headline .big{font-family:'Fraunces',serif;font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.headline .sub2{font-size:12.5px;color:var(--muted);margin-top:5px;max-width:80ch}
+.freerow{padding:4px 0;font-size:12.5px;color:var(--accent);font-style:italic}
+.freerow .code{font-family:'JetBrains Mono',monospace;font-size:10.5px;display:block;font-style:normal}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
 .stat{background:var(--surface);padding:12px 14px}
 .stat .k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
@@ -158,6 +164,15 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
 
     <hr class="divider">
     <div class="field">
+      <label class="lbl" for="startTerm">Starting term</label>
+      <select id="startTerm">
+        <option value="fall-2026" selected>Fall 2026</option>
+        <option value="spring-2027">Spring 2027</option>
+      </select>
+      <p class="hint">Terms alternate from here. A course is only scheduled in a term it is actually offered.</p>
+    </div>
+
+    <div class="field">
       <label class="lbl" for="cap">Credits per semester</label>
       <input type="number" id="cap" min="4" max="20" value="16">
       <p class="hint">NYU requires 16 and caps at 18 without an overload petition.</p>
@@ -176,6 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
   <main>
     <div id="cycleBanner" class="banner hidden"></div>
     <div id="exemptBanner" class="note hidden"></div>
+    <div class="headline" id="headline"></div>
     <div class="stats" id="stats"></div>
 
     <div class="tabs" role="tablist">
@@ -209,7 +225,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
 <script src="engine.js"></script>
 <script>
 let degreeId = 'econcs';
-let choices = {};
+let choices = {picks:{}};
 let completed = new Set();
 let selected = null;
 let injectCycle = false;
@@ -229,12 +245,15 @@ function render(){
   const cyc = findCycle(g);
   const {order, level, complete} = kahn(g);
   const crit = complete ? criticalPath(g, order) : {path:[], length:0};
-  const plan = packSemesters(g, readCap(), completed);
+  const budget = creditBudget(g, deg);
+  const [st, sy] = document.getElementById('startTerm').value.split('-');
+  const plan = packSemesters(g, readCap(), completed, st, +sy, budget.free);
 
   document.getElementById('schoolLine').textContent = deg.school + ' \u00b7 ' + deg.totalCredits + ' credits to graduate';
   renderCycle(cyc);
   renderExempt();
-  renderStats(g, crit, plan, cyc, complete, deg);
+  renderHeadline(plan, crit, budget, cyc, complete, deg);
+  renderStats(g, crit, plan, cyc, complete, deg, budget);
   renderChoices(deg);
   renderChecklist(g);
   renderTree(deg);
@@ -261,19 +280,37 @@ function renderExempt(){
     + `<div class="note-sub" style="margin-top:7px">Exemption policy varies by advisor. Edit <span class="mono">EXEMPTIONS</span> in data.js to match your degree audit.</div>`;
 }
 
-function renderStats(g, crit, plan, cyc, complete, deg){
-  const totalCr = g.nodes.reduce((s,c)=>s+creditsOf(c),0);
-  const leftCr  = g.nodes.filter(n=>!completed.has(n)).reduce((s,c)=>s+creditsOf(c),0);
-  const ready   = g.nodes.filter(n=>!completed.has(n) && g.inEdges.get(n).every(p=>completed.has(p))).length;
-  const bound   = complete ? (plan.semesters.length > crit.length ? 'volume-bound' : 'sequence-bound') : 'no valid ordering';
-  const diff    = totalCr - deg.totalCredits;
-  const fit     = diff === 0 ? 'matches the degree total' : (diff > 0 ? diff + ' over' : (-diff) + ' under, room for free electives');
+function renderHeadline(plan, crit, budget, cyc, complete, deg){
+  const el = document.getElementById('headline');
+  if(cyc || !complete){
+    el.innerHTML = '<div class="k">No valid path</div><div class="big">\u2014</div>'
+      + '<div class="sub2">A circular prerequisite makes the degree unschedulable.</div>';
+    return;
+  }
+  const n = plan.semesters.length;
+  const last = plan.semesters[n-1];
+  const bound = n > crit.length
+    ? 'You are volume-bound: the dependency chain is only ' + crit.length + ' deep, so the extra terms are credits, not sequencing. A heavier load would shorten this.'
+    : 'You are sequence-bound: the dependency chain is ' + crit.length + ' courses deep, so no amount of extra load per term would finish it sooner.';
+  el.innerHTML =
+    `<div class="k">Shortest path to the degree</div>
+     <div class="big">${n} semester${n===1?'':'s'} \u00b7 finishing ${termLabel(last)}</div>
+     <div class="sub2">${budget.required} required credits plus ${budget.free} free, totalling ${deg.totalCredits}. ${bound}</div>`;
+}
+
+function renderStats(g, crit, plan, cyc, complete, deg, budget){
+  const leftCr = g.nodes.filter(n=>!completed.has(n)).reduce((s,c)=>s+creditsOf(c),0);
+  const ready  = g.nodes.filter(n=>!completed.has(n) && g.inEdges.get(n).every(p=>completed.has(p))).length;
 
   const cells = [
-    {k:'Credits required', v:totalCr, n:fit, cls: diff===0?'good':''},
-    {k:'Credits remaining', v:leftCr, n:ready + ' courses available now'},
+    {k:'Required credits', v:budget.required,
+     n: budget.over ? budget.over + ' over the degree total' : g.nodes.length + ' courses to complete',
+     cls: budget.over ? 'bad' : ''},
+    {k:'Free electives', v:budget.free,
+     n: budget.free ? 'credits, about ' + budget.freeCourses + ' courses of your choosing' : 'no room, the major fills the degree',
+     cls: budget.free ? 'good' : 'bad'},
     {k:'Critical path', v:complete?crit.length:'\u2014', n:'longest dependency chain', cls: complete?'':'bad'},
-    {k:'Semesters', v:cyc?'\u2014':plan.semesters.length, n:bound, cls: cyc?'bad':''}
+    {k:'Still to take', v:leftCr, n:ready + ' courses available now'}
   ];
   document.getElementById('stats').innerHTML = cells.map(c =>
     `<div class="stat ${c.cls||''}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="n">${c.n}</div></div>`).join('');
@@ -306,8 +343,26 @@ function renderChecklist(g){
 function renderTree(deg){
   document.getElementById('treeBox').innerHTML = treeHTML(deg.tree, 0);
   document.querySelectorAll('.optbtn').forEach(b => b.addEventListener('click', e => {
-    choices[e.target.dataset.id] = +e.target.dataset.i; selected = null; render();
+    const t = e.target;
+    if(t.dataset.pool){
+      const id = t.dataset.pool, code = t.dataset.c;
+      const cur = choices.picks[id] || [];
+      const node = findSlots(DEGREES[degreeId].tree, id);
+      if(cur.includes(code)) choices.picks[id] = cur.filter(x=>x!==code);
+      else if(cur.length < node.n) choices.picks[id] = [...cur, code];
+    } else {
+      choices[t.dataset.id] = +t.dataset.i;
+    }
+    selected = null; render();
   }));
+}
+
+function findSlots(node, id){
+  if(node.kind === 'slots' && node.id === id) return node;
+  const kids = node.kind === 'group' ? node.children
+             : node.kind === 'choice' ? node.options.flatMap(o=>o.children) : [];
+  for(const k of kids){ const hit = findSlots(k, id); if(hit) return hit; }
+  return null;
 }
 
 function treeHTML(node, depth){
@@ -323,8 +378,21 @@ function treeHTML(node, depth){
       const done = completed.has(node.code) ? ' done' : '';
       return `<div class="trow"><span class="tcode${done}">${node.code}</span><span>${d.name}</span><span class="tcr">${d.credits} cr</span></div>`;
     }
-    case 'slots':
-      return `<div class="trow"><span class="tcode">${node.prefix}</span><span class="tslot">${node.n} \u00d7 ${node.label}</span><span class="tcr">${node.n*4} cr</span></div>`;
+    case 'slots': {
+      const pool = POOLS[node.pool];
+      const chosen = choices.picks[node.id] || [];
+      const full = chosen.length >= node.n;
+      return `<div class="tchoice">
+        <div class="hd">Choose ${node.n} \u00b7 ${pool.label}</div>
+        <div class="cnote">${chosen.length} of ${node.n} chosen from ${pool.courses.length} options. Which you pick changes the graph: some need Basic Algorithms, others only Computer Systems.</div>
+        <div class="opts">${pool.courses.map(c=>{
+          const on = chosen.includes(c);
+          const dis = !on && full;
+          return `<button class="optbtn" data-pool="${node.id}" data-c="${c}" aria-pressed="${on}"${dis?' style="opacity:.4"':''}>${c.replace('CSCI-UA ','').replace('ECON-UA ','')} \u00b7 ${courseDef(c).name}</button>`;
+        }).join('')}</div>
+        ${chosen.length < node.n ? `<div class="cnote">${node.n-chosen.length} slot${node.n-chosen.length>1?'s':''} left open, shown in the graph as a placeholder.</div>` : ''}
+      </div>`;
+    }
     case 'choice': {
       const pick = choices[node.id] ?? 0;
       const inner = node.options[pick].children.map(c=>treeHTML(c, depth+1)).join('')
@@ -405,10 +473,15 @@ function renderPlan(plan, crit){
   const critSet=new Set(crit.path);
   const grid=document.getElementById('semgrid');
   if(!plan.semesters.length){ grid.innerHTML='<div class="sem"><ul><li>Nothing left to schedule.</li></ul></div>'; return; }
-  let html=plan.semesters.map((s,i)=>
-    `<div class="sem"><h3>Semester ${i+1}<span>${s.credits} cr</span></h3><ul>${
-      s.courses.map(c=>`<li class="${critSet.has(c)?'crit':''}"><span class="code">${c} \u00b7 ${creditsOf(c)} cr</span>${courseDef(c).name}</li>`).join('')
-    }</ul></div>`).join('');
+  let html=plan.semesters.map(s=>
+    `<div class="sem"><h3>${termLabel(s)}<span>${s.credits} cr</span></h3><ul>${
+      (s.courses.length
+        ? s.courses.map(c=>`<li class="${critSet.has(c)?'crit':''}"><span class="code">${c} \u00b7 ${creditsOf(c)} cr</span>${courseDef(c).name}</li>`).join('')
+        : (s.freeCredits ? '' : '<li><span class="code">\u2014</span>Nothing available this term</li>'))
+      + (s.freeCredits ? `<li class="freerow"><span class="code">FREE \u00b7 ${s.freeCredits} cr</span>${s.freeCredits/4} elective${s.freeCredits===4?'':'s'} of your choosing</li>` : '')
+    }</ul>${s.waiting && s.waiting.length
+        ? `<div class="note-sub" style="padding:0 12px 10px">Ready but not offered in ${s.term}: <span class="mono">${s.waiting.join(', ')}</span></div>`
+        : ''}</div>`).join('');
   if(plan.stranded.length){
     html+=`<div class="sem" style="border-color:var(--danger)"><h3 style="color:var(--danger)">Unreachable<span>${plan.stranded.length}</span></h3><ul>${
       plan.stranded.map(c=>`<li><span class="code">${c}</span>${courseDef(c).name}</li>`).join('')}</ul></div>`;
@@ -431,11 +504,12 @@ function renderDetail(g){
 
 const degSel=document.getElementById('degree');
 degSel.innerHTML=Object.entries(DEGREES).map(([k,v])=>`<option value="${k}"${k===degreeId?' selected':''}>${v.name}</option>`).join('');
-degSel.addEventListener('change',e=>{degreeId=e.target.value; choices={}; completed.clear(); selected=null; render();});
+degSel.addEventListener('change',e=>{degreeId=e.target.value; choices={picks:{}}; completed.clear(); selected=null; render();});
 
 document.getElementById('cap').addEventListener('input',render);
+document.getElementById('startTerm').addEventListener('change',render);
 document.getElementById('clearBtn').addEventListener('click',()=>{completed.clear(); selected=null; render();});
-document.getElementById('minBtn').addEventListener('click',()=>{choices=minCreditChoices(DEGREES[degreeId].tree); selected=null; render();});
+document.getElementById('minBtn').addEventListener('click',()=>{const p=choices.picks; choices=minCreditChoices(DEGREES[degreeId].tree); choices.picks=p; selected=null; render();});
 const cb=document.getElementById('cycleBtn');
 cb.addEventListener('click',()=>{injectCycle=!injectCycle; cb.textContent=injectCycle?'Remove circular prerequisite':'Inject a circular prerequisite'; selected=null; render();});
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{

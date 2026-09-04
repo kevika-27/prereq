@@ -11,20 +11,35 @@
    resolver is the only thing that knows about both.
    ============================================================ */
 
-// Synthetic courses for elective slots, created on demand so that
-// "four 400-level electives" becomes four real nodes in the graph.
+// An unfilled elective slot still needs to exist in the graph, so it
+// gets a synthetic placeholder carrying the pool's typical prerequisite.
 const SLOT_COURSES = {};
 
-function slotCode(prefix, i){ return `${prefix}-${i}`; }
+function poolFloor(poolId){
+  // The shallowest prerequisite any course in the pool needs, used as
+  // the placeholder's prerequisite so an undecided slot is not treated
+  // as free-floating.
+  const pool = POOLS[poolId];
+  const counts = {};
+  for(const c of pool.courses){
+    for(const p of (COURSES[c] ? COURSES[c].prereqs : [])) counts[p] = (counts[p]||0) + 1;
+  }
+  let best = null, bestN = 0;
+  for(const [p,n] of Object.entries(counts)) if(n > bestN){ best = p; bestN = n; }
+  return best;
+}
 
-function makeSlot(prefix, i, after, label){
-  const code = slotCode(prefix, i);
+function makeSlot(poolId, i){
+  const code = `${poolId}-open-${i}`;
   if(!SLOT_COURSES[code]){
+    const floor = poolFloor(poolId);
     SLOT_COURSES[code] = {
-      name: `${label} ${i}`,
+      name: `${POOLS[poolId].label} (not yet chosen)`,
       credits: 4,
-      prereqs: after ? [after] : [],
-      slot: true
+      prereqs: floor ? [floor] : [],
+      slot: true,
+      pool: poolId,
+      offered: ['fall','spring']
     };
   }
   return code;
@@ -48,11 +63,15 @@ function resolve(node, choices, out = []){
       for(const child of option.children) resolve(child, choices, out);
       break;
     }
-    case 'slots':
-      for(let i = 1; i <= node.n; i++){
-        out.push(makeSlot(node.prefix, i, node.after, node.label));
-      }
+    case 'slots': {
+      // picks[node.id] holds the courses the student actually chose.
+      // Any shortfall becomes an open placeholder slot.
+      const chosen = (choices.picks && choices.picks[node.id]) || [];
+      const taken = chosen.slice(0, node.n);
+      for(const c of taken) out.push(c);
+      for(let i = taken.length + 1; i <= node.n; i++) out.push(makeSlot(node.pool, i));
       break;
+    }
   }
   return out;
 }
@@ -277,27 +296,89 @@ function reach(g, start, edgeMap){
    SEMESTER PACKING — greedy over ready courses, ordered by how
    much each unlocks, filled to a credit budget.
    ------------------------------------------------------------ */
-function packSemesters(g, cap, completed = new Set()){
+function offeredIn(code, term){
+  const d = courseDef(code);
+  if(!d || !d.offered) return true;
+  return d.offered.includes(term);
+}
+
+/* ------------------------------------------------------------
+   SEMESTER PACKING — greedy over ready courses, ordered by how
+   much each unlocks, filled to a credit budget.
+
+   Terms alternate fall/spring, and a course can only be taken in
+   a term it is actually offered. This turns a pure ordering
+   problem into a constrained one: a fall-only course whose
+   prerequisites finish in the fall costs you a full year, not a
+   semester, and the planner has to skip it and come back.
+   ------------------------------------------------------------ */
+function packSemesters(g, cap, completed = new Set(), startTerm = 'fall', startYear = 2026, freeCredits = 0){
   const unlocks = new Map(g.nodes.map(n => [n, reach(g, n, g.outEdges).size]));
   const remaining = new Set(g.nodes.filter(n => !completed.has(n)));
   const have = new Set(completed);
   const semesters = [];
 
-  while(remaining.size){
-    const ready = [...remaining].filter(n => g.inEdges.get(n).every(p => have.has(p)));
-    if(!ready.length) break;
-    ready.sort((a, b) => unlocks.get(b) - unlocks.get(a) || a.localeCompare(b));
+  let term = startTerm, year = startYear;
+  let free = freeCredits;   // unrestricted credits still to be filled
+  let idle = 0;
 
+  while((remaining.size || free > 0) && idle < 2){
+    const eligible = [...remaining].filter(n =>
+      g.inEdges.get(n).every(p => have.has(p)) && offeredIn(n, term));
+    eligible.sort((a, b) => unlocks.get(b) - unlocks.get(a) || a.localeCompare(b));
+
+    // Required work first: it is what the prerequisite chain constrains.
     const taking = [];
     let load = 0;
-    for(const c of ready){
+    for(const c of eligible){
       if(load + creditsOf(c) > cap) continue;
       taking.push(c);
       load += creditsOf(c);
     }
-    if(!taking.length) break;
-    semesters.push({courses: taking, credits: load});
-    for(const c of taking){ remaining.delete(c); have.add(c); }
+
+    // Then spend leftover room on free electives. This is what makes the
+    // plan a real schedule rather than a list of requirements: every term
+    // fills to the credit minimum, and the free credits land wherever the
+    // required chain leaves a gap.
+    let freeHere = 0;
+    while(free > 0 && load + 4 <= cap){
+      freeHere += 4; load += 4; free -= 4;
+    }
+
+    const waiting = [...remaining].filter(n =>
+      g.inEdges.get(n).every(p => have.has(p)) && !offeredIn(n, term));
+
+    if(taking.length || freeHere){
+      semesters.push({courses: taking, freeCredits: freeHere, credits: load, term, year, waiting});
+      for(const c of taking){ remaining.delete(c); have.add(c); }
+      idle = 0;
+    } else {
+      idle++;
+      if(remaining.size) semesters.push({courses: [], freeCredits: 0, credits: 0, term, year, waiting});
+    }
+
+    if(term === 'fall'){ term = 'spring'; year++; } else { term = 'fall'; }
   }
-  return {semesters, stranded: [...remaining]};
+  return {semesters, stranded: [...remaining], freeUnplaced: free};
 }
+
+/* ------------------------------------------------------------
+   THE HEADLINE NUMBERS
+   Required credits come from the resolved requirement tree.
+   Free credits are whatever the degree total leaves over, which
+   is the number students actually want: how much room is there
+   for anything at all.
+   ------------------------------------------------------------ */
+function creditBudget(g, degree){
+  const required = g.nodes.reduce((s, c) => s + creditsOf(c), 0);
+  const free = Math.max(0, degree.totalCredits - required);
+  return {
+    required,
+    free,
+    freeCourses: Math.floor(free / 4),
+    total: degree.totalCredits,
+    over: Math.max(0, required - degree.totalCredits)
+  };
+}
+
+function termLabel(s){ return (s.term === 'fall' ? 'Fall ' : 'Spring ') + s.year; }
