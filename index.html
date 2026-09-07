@@ -190,7 +190,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
 
   <main>
     <div id="cycleBanner" class="banner hidden"></div>
-    <div id="exemptBanner" class="note hidden"></div>
+    <div id="sourceNote" class="note"></div>
     <div class="headline" id="headline"></div>
     <div class="stats" id="stats"></div>
 
@@ -208,7 +208,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
         <span><i style="background:var(--done)"></i>Completed</span>
         <span><i style="background:var(--accent)"></i>Available now</span>
         <span><i style="background:var(--primary)"></i>Selected and prerequisites</span>
-        <span><i style="border:1px dashed var(--muted)"></i>Core Curriculum</span>
+        <span><i style="border:1px dashed var(--muted)"></i>General Education</span>
       </div>
       <div class="detail" id="detail"></div>
     </section>
@@ -218,7 +218,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:16px 28px;color:
 </div>
 
 <footer class="wrap">
-  Requirements transcribed from the NYU Bulletin, the Courant course sequence pages, and the CAS Core Curriculum site. Verify against Albert before registering. Built as a data structures exercise: an AND/OR requirement tree resolved into a DAG, then Kahn topological sort, three-colour DFS cycle detection, longest-path dynamic programming, and greedy credit-budgeted scheduling, all written from scratch.
+  Degree requirements transcribed from the 2026-2027 NYU Bulletin program pages; CSCI-UA prerequisites and term offerings from the Bulletin course pages. Verify against Albert before registering. Built as a data structures exercise: an AND/OR requirement tree resolved into a DAG, then Kahn topological sort, three-colour DFS cycle detection, longest-path dynamic programming, and greedy credit-budgeted scheduling, all written from scratch.
 </footer>
 
 <script src="data.js"></script>
@@ -230,17 +230,13 @@ let completed = new Set();
 let selected = null;
 let injectCycle = false;
 let view = 'tree';
-let lastDropped = [];
 
 function readCap(){ const v = +document.getElementById('cap').value; return (isFinite(v) && v >= 4) ? v : 16; }
-function isCore(c){ const d = courseDef(c); return !!(d && d.core); }
+function isGenEd(c){ const d = courseDef(c); return !!(d && d.gened); }
 
 function render(){
   const deg = DEGREES[degreeId];
-  const raw = resolve(deg.tree, choices);
-  const {codes, dropped} = applyExemptions(raw);
-  lastDropped = dropped;
-
+  const codes = resolve(deg.tree, choices);
   const g = buildGraph(codes, {injectCycle});
   const cyc = findCycle(g);
   const {order, level, complete} = kahn(g);
@@ -251,7 +247,7 @@ function render(){
 
   document.getElementById('schoolLine').textContent = deg.school + ' \u00b7 ' + deg.totalCredits + ' credits to graduate';
   renderCycle(cyc);
-  renderExempt();
+  renderSource(deg);
   renderHeadline(plan, crit, budget, cyc, complete, deg);
   renderStats(g, crit, plan, cyc, complete, deg, budget);
   renderChoices(deg);
@@ -270,32 +266,10 @@ function renderCycle(cyc){
     + 'Three-colour DFS traced the loop: <span class="mono">' + cyc.join(' \u2192 ') + '</span>';
 }
 
-function renderExempt(){
-  const el = document.getElementById('exemptBanner');
-  if(!lastDropped.length){ el.classList.add('hidden'); return; }
-  el.classList.remove('hidden');
-  const saved = lastDropped.reduce((s,e)=>s+e.credits,0);
-  el.innerHTML = `<div class="note-hd">Core already covered by your major \u00b7 ${saved} credits saved</div>`
-    + lastDropped.map(e => `<div class="note-row"><span class="mono">${e.code}</span><span>${courseDef(e.code).name}</span><span class="note-by">via <span class="mono">${e.by}</span></span></div><div class="note-sub">${e.note}</div>`).join('')
-    + `<div class="note-sub" style="margin-top:7px">Exemption policy varies by advisor. Edit <span class="mono">EXEMPTIONS</span> in data.js to match your degree audit.</div>`;
-}
-
-function renderHeadline(plan, crit, budget, cyc, complete, deg){
-  const el = document.getElementById('headline');
-  if(cyc || !complete){
-    el.innerHTML = '<div class="k">No valid path</div><div class="big">\u2014</div>'
-      + '<div class="sub2">A circular prerequisite makes the degree unschedulable.</div>';
-    return;
-  }
-  const n = plan.semesters.length;
-  const last = plan.semesters[n-1];
-  const bound = n > crit.length
-    ? 'You are volume-bound: the dependency chain is only ' + crit.length + ' deep, so the extra terms are credits, not sequencing. A heavier load would shorten this.'
-    : 'You are sequence-bound: the dependency chain is ' + crit.length + ' courses deep, so no amount of extra load per term would finish it sooner.';
-  el.innerHTML =
-    `<div class="k">Shortest path to the degree</div>
-     <div class="big">${n} semester${n===1?'':'s'} \u00b7 finishing ${termLabel(last)}</div>
-     <div class="sub2">${budget.required} required credits plus ${budget.free} free, totalling ${deg.totalCredits}. ${bound}</div>`;
+function renderSource(deg){
+  const el = document.getElementById('sourceNote');
+  el.innerHTML = `<div class="note-hd">Transcribed from ${deg.source}</div>`
+    + `<div class="note-sub">${deg.note}</div>`;
 }
 
 function renderStats(g, crit, plan, cyc, complete, deg, budget){
@@ -454,7 +428,7 @@ function renderGraph(g, level, cyc){
     el.className='node';
     const ready = !completed.has(n) && g.inEdges.get(n).every(q=>completed.has(q));
     if(completed.has(n)) el.classList.add('done'); else if(ready) el.classList.add('ready');
-    if(isCore(n)) el.classList.add('core');
+    if(isGenEd(n)) el.classList.add('core');
     if(cycSet.has(n)) el.classList.add('cyc');
     if(selected){
       if(n===selected) el.classList.add('sel');

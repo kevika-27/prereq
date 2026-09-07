@@ -29,8 +29,12 @@ function poolFloor(poolId){
   return best;
 }
 
-function makeSlot(poolId, i){
-  const code = `${poolId}-open-${i}`;
+// Keyed by the slot node's id, not the pool's. Two requirements can draw
+// from the same pool (Economics needs two 300-level theory electives plus
+// one more elective), and keying by pool would collide their placeholders
+// and silently lose credits.
+function makeSlot(slotId, poolId, i){
+  const code = `${slotId}-open-${i}`;
   if(!SLOT_COURSES[code]){
     const floor = poolFloor(poolId);
     SLOT_COURSES[code] = {
@@ -69,7 +73,7 @@ function resolve(node, choices, out = []){
       const chosen = (choices.picks && choices.picks[node.id]) || [];
       const taken = chosen.slice(0, node.n);
       for(const c of taken) out.push(c);
-      for(let i = taken.length + 1; i <= node.n; i++) out.push(makeSlot(node.pool, i));
+      for(let i = taken.length + 1; i <= node.n; i++) out.push(makeSlot(node.id, node.pool, i));
       break;
     }
   }
@@ -117,26 +121,6 @@ function minCreditChoices(node, choices = {}){
   }
   cost(node);
   return choices;
-}
-
-/* ------------------------------------------------------------
-   EXEMPTIONS — applied after resolution, since a Core requirement
-   can only be judged covered once you know which major courses
-   the choices actually produced.
-   ------------------------------------------------------------ */
-function applyExemptions(codes){
-  const set = new Set(codes);
-  const dropped = [];
-  for(const rule of EXEMPTIONS){
-    if(!set.has(rule.core)) continue;
-    const hit = rule.by.find(m => set.has(m));
-    if(hit){
-      set.delete(rule.core);
-      dropped.push({code: rule.core, by: hit, note: rule.note,
-                    credits: courseDef(rule.core).credits});
-    }
-  }
-  return {codes: [...set], dropped};
 }
 
 /* ------------------------------------------------------------
